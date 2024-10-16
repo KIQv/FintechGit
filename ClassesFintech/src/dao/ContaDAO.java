@@ -2,88 +2,60 @@ package dao;
 
 import model.Conta;
 import database.ConexaoBanco;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContaDAO {
-    // Método para inserir uma nova conta
     public void insert(Conta conta) {
-        String sql = "INSERT INTO CONTA (cd_conta, tipo_conta, saldo, cd_usuario) VALUES (?, ?, ?, ?)";
-
-        try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, conta.getCdConta());
-            pstmt.setString(2, conta.getTipoConta());
-            pstmt.setDouble(3, conta.getSaldo());
-            pstmt.setInt(4, conta.getCdUsuario());
-
-            pstmt.executeUpdate();
-            System.out.println("Conta inserida com sucesso!");
-        } catch (SQLException e) {
-            System.out.println("Erro ao inserir conta: " + e.getMessage());
-        }
-    }
-
-    public void update(Conta conta) {
-        String sql = "UPDATE CONTA SET saldo = ? WHERE cd_conta = ?";
+        String sql = "INSERT INTO conta (cd_conta, tipo_conta, saldo, cd_usuario) VALUES (?, ?, ?, ?)"; // Usar nomes em minúsculas
         try (Connection conn = ConexaoBanco.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDouble(1, conta.getSaldo());
-            stmt.setInt(2, conta.getCdConta());
+            stmt.setInt(1, conta.getCdConta());
+            stmt.setString(2, conta.getTipoConta());
+            stmt.setDouble(3, conta.getSaldo());
+            stmt.setInt(4, conta.getCdUsuario());
             stmt.executeUpdate();
+            System.out.println("Conta inserida com sucesso!");
         } catch (SQLException e) {
-            e.printStackTrace(); // Tratar o erro adequadamente
+            System.err.println("Erro ao inserir conta: " + e.getMessage());
         }
     }
 
-    // Método para obter uma conta pelo ID
-    public Conta getById(int id) {
-        Conta conta = null;
-        String sql = "SELECT * FROM CONTA WHERE cd_conta = ?";
-
+    public void atualizarSaldo(int cdConta, double valor) {
+        String sql = "UPDATE conta SET saldo = saldo + ? WHERE cd_conta = ?";
         try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                conta = new Conta(
-                        rs.getInt("cd_conta"),
-                        rs.getString("tipo_conta"),
-                        rs.getDouble("saldo"),
-                        rs.getInt("cd_usuario")
-                );
-            }
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, valor);
+            stmt.setInt(2, cdConta);
+            stmt.executeUpdate();
+            System.out.println("Saldo atualizado com sucesso!");
         } catch (SQLException e) {
-            System.out.println("Erro ao buscar conta: " + e.getMessage());
+            System.err.println("Erro ao atualizar saldo: " + e.getMessage());
         }
-
-        return conta;
     }
 
-    // Método para obter todas as contas
+
     public List<Conta> getAll() {
         List<Conta> contas = new ArrayList<>();
-        String sql = "SELECT * FROM CONTA";
-
+        String sql = "SELECT * FROM conta"; // Usar nomes em minúsculas
         try (Connection conn = ConexaoBanco.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Conta conta = new Conta(
-                        rs.getInt("cd_conta"),
-                        rs.getString("tipo_conta"),
-                        rs.getDouble("saldo"),
-                        rs.getInt("cd_usuario") // ID do usuário associado
+                        rs.getInt("cd_conta"), // Usar nomes em minúsculas
+                        rs.getString("tipo_conta"), // Usar nomes em minúsculas
+                        rs.getDouble("saldo"), // Usar nomes em minúsculas
+                        rs.getInt("cd_usuario") // Usar nomes em minúsculas
                 );
                 contas.add(conta);
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao consultar contas: " + e.getMessage());
+            System.err.println("Erro ao consultar contas: " + e.getMessage());
         }
         return contas;
     }

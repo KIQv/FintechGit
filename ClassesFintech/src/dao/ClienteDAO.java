@@ -50,4 +50,41 @@ public class ClienteDAO {
         }
         return clientes;
     }
+
+    public Cliente getByUsuarioId(int cdUsuario) {
+        String sql = "SELECT * FROM CLIENTE WHERE cd_usuario = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, cdUsuario);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new Cliente(
+                        rs.getInt("cd_cliente"),
+                        rs.getInt("cd_usuario"),
+                        rs.getString("tipo_conta"),
+                        rs.getDouble("saldo")
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao recuperar cliente: " + e.getMessage());
+        }
+        return null; // Retorna null se não encontrar o cliente
+    }
+
+    public void atualizaSaldo(int cdCliente, double valor) {
+        String sql = "UPDATE CLIENTE SET saldo = saldo + ? WHERE cd_cliente = ?";
+        try (Connection conn = ConexaoBanco.conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setDouble(1, valor);
+            pstmt.setInt(2, cdCliente);
+            pstmt.executeUpdate();
+            System.out.println("Saldo atualizado com sucesso!");
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar saldo: " + e.getMessage());
+        }
+    }
+
 }
