@@ -1,4 +1,3 @@
-// Transacao.java
 package transaction;
 
 import model.Conta;

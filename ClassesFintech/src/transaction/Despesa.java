@@ -46,4 +46,14 @@ public class Despesa {
     public void setCdConta(int cdConta) {
         this.cdConta = cdConta;
     }
+
+    @Override
+    public String toString() {
+        return "Despesa{" +
+                "cdDespesa=" + cdDespesa +
+                ", valor=" + valor +
+                ", descricao='" + descricao + '\'' +
+                ", cdConta=" + cdConta +
+                '}';
+    }
 }
